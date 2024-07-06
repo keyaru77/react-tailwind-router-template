@@ -1,43 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
 
-interface Episode {
-  href: string;
-  imgSrc: string;
+interface AnimeDetails {
   title: string;
-  eps: string;
-}
-
-interface ServerLink {
-  url: string;
-  text: string;
-}
-
-interface Server {
-  server: string;
-  links: ServerLink[];
-}
-
-interface AnimeDetail {
-  iframeSrc: string;
-  episodes: Episode[];
-  title: string;
-  epn: string;
-  epx: string;
-  tanggal: string;
-  prev: string;
-  prevtex: string;
-  allepx: string;
-  allepxtex: string;
-  next: string;
-  nexttex: string;
-  download: string;
-  servers: Server[];
   imganime: string;
   titleanime: string;
-  titlealter: string;
-  rating: string;
+  episodes: {
+    href: string;
+    imgSrc: string;
+    title: string;
+    eps: string;
+  }[];
+  servers: {
+    server: string;
+    links: {
+      url: string;
+      text: string;
+    }[];
+  }[];
   details: {
     Status: string;
     "Tipe Karakter": {
@@ -66,69 +47,100 @@ interface AnimeDetail {
 
 const AnimeDetail: React.FC = () => {
   const { endpoint } = useParams<{ endpoint: string }>();
-  const [animeDetail, setAnimeDetail] = useState<AnimeDetail | null>(null);
+  const [data, setData] = useState<AnimeDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAnimeDetail = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`https://api.koranime.fun/v1/nonton/${endpoint}`);
-        setAnimeDetail(response.data);
+        const response = await fetch(`https://api.koranime.fun/v1/nonton/${endpoint}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const jsonData = await response.json();
+        setData(jsonData);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching anime detail:", error);
-        setError("Failed to load anime detail");
+        console.error("Error fetching the data:", error);
+        setError("Failed to load data");
         setLoading(false);
       }
     };
-
-    fetchAnimeDetail();
+    fetchData();
   }, [endpoint]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center mt-8">Loading...</div>;
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-center mt-8">{error}</div>;
   }
 
-  if (!animeDetail) {
-    return <div>No anime detail available</div>;
+  if (!data) {
+    return <div className="text-center mt-8">No data available</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">{animeDetail.title}</h1>
-      <iframe src={animeDetail.iframeSrc} className="w-full h-64 mb-4" title="Anime Video"></iframe>
-      {/* Render other details and components here */}
-      {/* Example rendering episodes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {animeDetail.episodes.map((episode, index) => (
-          <AnimeCard key={index} episode={episode} />
-        ))}
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="flex flex-wrap items-center justify-between">
+        <div className="w-full md:w-1/2 mb-4 md:mb-0">
+          <h1 className="text-3xl font-bold">{data.title}</h1>
+          <p className="text-gray-600">{data.details.Jenis} - {data.details.Status}</p>
+          <div className="mt-4">
+            <img src={data.imganime} alt={data.titleanime} className="w-full rounded-lg shadow-md" />
+          </div>
+          <p className="mt-4">{data.deskripsi}</p>
+        </div>
+        <div className="w-full md:w-1/2">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Episodes</h2>
+            <ul className="divide-y divide-gray-300">
+              {data.episodes.map((episode, index) => (
+                <li key={index} className="py-2 flex items-center">
+                  <Link to={episode.href} className="flex items-center">
+                    <img src={episode.imgSrc} alt={episode.title} className="w-16 h-16 object-cover rounded-md shadow-md" />
+                    <div className="ml-4">
+                      <p className="font-bold">{episode.title}</p>
+                      <p>{episode.eps}</p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Streaming Servers</h2>
+            <ul className="divide-y divide-gray-300">
+              {data.servers.map((server, index) => (
+                <li key={index} className="py-2">
+                  <p className="font-bold">{server.server}</p>
+                  <ul className="ml-4">
+                    {server.links.map((link, idx) => (
+                      <li key={idx} className="py-1">
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{link.text}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Genres</h2>
+            <ul className="ml-4">
+              {data.genres.map((genre, index) => (
+                <li key={index} className="inline-block mr-2">
+                  <Link to={genre.link} className="text-blue-500 hover:underline">{genre.genre}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default AnimeDetail;
-
-interface AnimeCardProps {
-  episode: Episode;
-}
-
-const AnimeCard: React.FC<AnimeCardProps> = ({ episode }) => {
-  return (
-    <div className="bg-gray-100 p-4 rounded">
-      <a href={episode.href} target="_blank" rel="noopener noreferrer" className="block">
-        <img src={episode.imgSrc} alt={episode.title} className="w-full mb-2" />
-        <h3 className="text-lg font-bold">{episode.title}</h3>
-        <p>{episode.eps}</p>
-      </a>
-    </div>
-  );
-};
-
-export default AnimeCard;
