@@ -71,7 +71,7 @@ interface AnimeDetails {
 }
 
 const AnimeDetail: React.FC = () => {
-  const { endpoint } = useParams<{ endpoint: string }>();
+  const { endpoint } = useParams();
   const [data, setData] = useState<AnimeDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
