@@ -8,7 +8,7 @@ const AnimeDetail: React.FC = () => {
 
   return (
     <div>
-      <h2>Detail untuk {end}</h2>
+      <h2>Detail untuk {endpoint}</h2>
       {/* Tampilkan detail anime atau konten sesuai dengan nilai 'end' */}
     </div>
   );
