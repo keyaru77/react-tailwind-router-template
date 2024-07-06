@@ -80,7 +80,6 @@ const AnimeDetail: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`https://api.koranime.fun/v1/nonton/${endpoint}`);
-        console.log('API Response:', response.data); // Debugging line
         setData(response.data);
         setLoading(false);
       } catch (error) {
