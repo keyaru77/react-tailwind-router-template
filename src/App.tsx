@@ -1,10 +1,9 @@
-// src/App.tsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Post from "./pages/Post";
-import NotFound from "./pages/NotFound";
-import Anime from "./pages/Anime";
+import Home from "./pages/home";
+import Post from "./pages/post";
+import AnimeDetail from "./pages/AnimeDetail";
+import NotFound from "./pages/notFound";
 
 const App: React.FC = () => {
   return (
@@ -12,7 +11,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/post/:id" element={<Post />} />
-        <Route path="/anime/:endpoint" element={<Anime />} />
+        <Route path="/watch/:endpoint" element={<AnimeDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
