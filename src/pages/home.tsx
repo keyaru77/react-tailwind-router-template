@@ -6,7 +6,7 @@ const Home: React.FC = () => {
     <div className="p-8 text-center">
       <h1 className="text-4xl font-bold mb-4">Welcome to the Home Page</h1>
       <p className="text-lg">
-        Edit App.tsx to add more routes. If you want to go through all the
+        Edit App.tsx to add more routes.u If you want to go through all the
         available routes. Visit the following Links:
       </p>
       <div className="flex justify-center items-center gap-4 mt-5">
